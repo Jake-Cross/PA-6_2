@@ -1,0 +1,192 @@
+---
+format:
+  html:
+    embed-resources: true
+jupyter: python3
+---
+
+1.  Complete the Check-in before Section 7.2.1:
+
+    Modify the code above so that instead of creating one long string, we create a list, where each element is one of the verses of the song.
+
+```{python}
+def sing_verse(num):
+    song = (
+        str(num) + " bottles of beer on the wall\n"
+        + str(num) + " bottles of beer\n"
+        + " take one down, pass it around,\n"
+        + str(num - 1) + " bottles of beer on the wall"
+    )
+
+    return song
+
+
+song_list = []
+
+for i in range(100, 97, -1):
+    song_list.append(sing_verse(i))
+
+song_list
+```
+
+2.  Complete the first bullet of the Check-in before Section 7.3.
+
+    Write a function `sqrt_pos_unvec()` that takes in a single value as an argument, and returns the square root if the value is positive. Then, write a for loop that uses this function to construct a new vector where the positive values are square rooted.
+
+```{python}
+def sqrt_pos_unvec(x):
+    if x > 0:
+        return x ** 0.5
+    else:
+        return x
+```
+
+```{python}
+values = [-4, 9, -1, 16, 25]
+```
+
+```{python}
+new_values = []
+
+for x in values:
+    new_values.append(sqrt_pos_unvec(x))
+
+new_values
+```
+
+3.  Complete the second bullet of the Check-in before Section 7.3.
+
+    Write a function `sqrt_pos_vec()` that takes in a vector of values, and returns a vector with the positive values square rooted. Do not use a for loop inside your function.
+
+```{python}
+import numpy as np
+def sqrt_pos_vec(x):
+    x = np.array(x)
+    result = x.copy()
+
+    result[result > 0] = np.sqrt(result[result > 0])
+
+    return result
+```
+
+```{python}
+values = [-4, 9, -1, 16, 25]
+
+sqrt_pos_vec(values)
+```
+
+4.  Complete the Check-in before Section 7.4.
+    - a. Write a `sing_verse_3()` function that also lets us change the container (e.g. bottle, can, …) at each step of the loop.
+    - b. Use `map()` to sing a few verses.
+    - c. What happens if you supply three different drinks, but only two different types of containers?
+
+```{python}
+def sing_verse_3(num, drink, container):
+
+    if container == "glass":
+        container_plural = "glasses"
+    else:
+        container_plural = container + "s"
+
+    song = (
+        str(num) + " " + container_plural + " of " + drink + " on the wall\n"
+        + str(num) + " " + container_plural + " of " + drink + "\n"
+        + "take one down, pass it around,\n"
+        + str(num - 1) + " " + container_plural + " of " + drink + " on the wall"
+    )
+
+    return song
+```
+
+```{python}
+nums = [100, 99, 98]
+
+drinks = ["beer", "soda", "juice"]
+
+containers = ["bottle", "can", "glass"]
+
+verses = list(map(sing_verse_3, nums, drinks, containers))
+
+verses
+```
+
+```{python}
+nums = [100, 99, 98]
+
+drinks = ["beer", "soda", "juice"]
+
+containers = ["bottle", "can"]
+
+verses = list(map(sing_verse_3, nums, drinks, containers))
+
+verses
+```
+
+5.  Complete the Check-in before Section 7.5.
+
+    Use a lambda function with `sing_verse_3()` to sing a few verses about milk in glasses.
+
+```{python}
+nums = [100, 99, 98]
+
+verses = list(
+    map(lambda x: sing_verse_3(x, "milk", "glass"), nums)
+)
+
+verses
+```
+
+6. Load the `penguins` dataset from the `palmerpenguins` library, as well as any other libraries you need. Then write a function that takes in information about a penguin, and returns one of the following definitions:
+
+*   "Big Mouth Billy": Male penguins with bill length times bill depth greater than 800.
+*   "Dainty Daisy": Female penguins with flipper length less than 5% of body mass.
+*   "Average Adelie:" Any Adelie penguins that do not fall into either category.
+*   "Other": Any penguins that do not fall into any of the categories.
+
+
+```{python}
+from palmerpenguins import load_penguins
+
+penguins = load_penguins()
+
+def penguin_type(penguin):
+
+    if (
+        penguin["sex"] == "male"
+        and penguin["bill_length_mm"] * penguin["bill_depth_mm"] > 800
+    ):
+        return "Big Mouth Billy"
+
+    elif (
+        penguin["sex"] == "female"
+        and penguin["flipper_length_mm"] < 0.05 * penguin["body_mass_g"]
+    ):
+        return "Dainty Daisy"
+
+    elif penguin["species"] == "Adelie":
+        return "Average Adelie"
+
+    else:
+        return "Other"
+```
+
+```{python}
+penguins["penguin_type"] = penguins.apply(penguin_type, axis=1)
+
+penguins[["species", "sex", "penguin_type"]].head()
+```
+
+7. Use an iterable function to create a new variable in the data frame called `category_name` that adds these labels.
+
+```{python}
+penguins["category_name"] = penguins.apply(penguin_type, axis=1)
+
+penguins[["species", "sex", "category_name"]].head()
+```
+
+8. Summarize the `category_name` variable to find the counts for each type.
+
+```{python}
+penguins["category_name"].value_counts().reset_index()
+```
+
